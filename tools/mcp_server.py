@@ -127,7 +127,8 @@ def publish_pull_request(issue_number: int, summary: str) -> str:
         subprocess.run(["git", "commit", "-m", f"Implement feature for issue #{issue_number}"], check=True)
         subprocess.run(["git", "push", "-u", "origin", branch_name], check=True)
 
-        url = f"https://api.github.com/repos/{repo}/pulls"
+        api_base = os.getenv("GITHUB_API_URL", "https://api.github.com")
+        url = f"{api_base}/repos/{repo}/pulls"
         data = json.dumps({
             "title": f"Automated Feature Implementation (Issue #{issue_number})",
             "body": f"Resolves #{issue_number}.\n\n### Summary of Changes:\n{summary}",
