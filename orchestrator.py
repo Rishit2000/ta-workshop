@@ -19,12 +19,16 @@ def run_multi_agent_pipeline(issue_number: int, max_attempts: int = 4):
 
     dev_feedback = None
     test_output = None
+    accumulated_summaries = []
 
     for attempt in range(1, max_attempts + 1):
         print(f"\n--- Attempt {attempt} of {max_attempts} ---")
 
         files_content = execute_mcp_tool("get_files", {"file_paths": files_needed})
         implementation = implement_feature(issue, plan, files_content, memory_context, dev_feedback, test_output)
+
+        if "summary" in implementation:
+            accumulated_summaries.append(f"- **Attempt {attempt}:** {implementation['summary']}")
 
         if "edits" in implementation:
             execute_mcp_tool("apply_edits", {"edits": implementation["edits"]})
@@ -42,11 +46,15 @@ def run_multi_agent_pipeline(issue_number: int, max_attempts: int = 4):
 
         if tests["passed"] and status == "APPROVE":
             print("\nPipeline successful! Creating Pull Request...")
+
+            full_summary = "\n".join(accumulated_summaries)
+
             pr_result = execute_mcp_tool("publish_pull_request", {
                 "issue_number": issue_number,
-                "summary": implementation.get("summary", "Multi-agent feature update")
+                "summary": full_summary
             })
-            print(pr_result)
+
+            print(f"Pull Request Status: {pr_result}")
             return
 
     print(f"\nPipeline failed after {max_attempts} attempts.")
