@@ -42,10 +42,11 @@ def run_multi_agent_pipeline(issue_number: int, max_attempts: int = 4):
 
         if tests["passed"] and status == "APPROVE":
             print("\nPipeline successful! Creating Pull Request...")
-            execute_mcp_tool("publish_pull_request", {
+            pr_result = execute_mcp_tool("publish_pull_request", {
                 "issue_number": issue_number,
                 "summary": implementation.get("summary", "Multi-agent feature update")
             })
+            print(pr_result)
             return
 
     print(f"\nPipeline failed after {max_attempts} attempts.")
