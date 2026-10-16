@@ -42,7 +42,9 @@ def run_single_agent(issue_number: int):
     print(tests['output'])
 
     if tests["passed"]:
-        execute_mcp_tool("publish_pull_request", {
+        print("\nTests passed! Creating Pull Request...")
+        pr_result = execute_mcp_tool("publish_pull_request", {
             "issue_number": issue_number,
             "summary": result.get("summary", "Automated feature implementation")
         })
+        print(f"Pull Request Status: {pr_result}")
